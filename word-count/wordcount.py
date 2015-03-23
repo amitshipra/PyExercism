@@ -8,8 +8,8 @@ def word_count(line):
 
     for word in words:
         if word in counts:
-            counts[word]=counts[word] + 1
+            counts[word] += 1
         else:
-            counts[word]=1
+            counts[word] = 1
 
     return counts

@@ -8,5 +8,5 @@ def to_rna(strand):
     rna = ''
 
     for seq_element in strand:
-        rna = rna + mapping[seq_element]
+        rna += mapping[seq_element]
     return rna
