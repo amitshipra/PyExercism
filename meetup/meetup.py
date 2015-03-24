@@ -23,8 +23,6 @@ def meetup_day(year, month, week_day, qualifier):
         if current_day.month > month:
             break
 
-    print(relevant_days)
-
     if qualifier != 'teenth':
         try:
             qualifier_index = QUALIFIERS[qualifier]
