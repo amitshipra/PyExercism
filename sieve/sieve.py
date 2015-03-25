@@ -9,14 +9,13 @@ def sieve(limit):
         if divisor >= limit / 2:
             return None
 
-        for n in range(limit + 1):
+        for n in num_map:
             if n <= divisor:
                 continue
             elif n % divisor == 0:
                 num_map[n] = False
 
-        divisor += 1
-        mark_divisiblity(divisor)
+        mark_divisiblity(divisor + 1)
 
     mark_divisiblity(2)
 
