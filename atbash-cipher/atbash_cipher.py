@@ -23,3 +23,4 @@ def encode(st):
             encoded.append(ch)
     partition = [encoded[i:i + GROUP_SIZE] for i in range(0, len(encoded), GROUP_SIZE)]
     return ' '.join([''.join(elem) for elem in partition])
+
