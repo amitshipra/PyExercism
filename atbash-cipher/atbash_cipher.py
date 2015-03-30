@@ -1,7 +1,9 @@
 __author__ = 'agupt15'
 
-PLAIN = 'abcdefghijklmnopqrstuvwxyz'
-CIPHER = 'zyxwvutsrqponmlkjihgfedcba'
+import string
+
+PLAIN = string.ascii_lowercase
+CIPHER = reversed(PLAIN)
 CIPHER_MAP = {p: c for (p, c) in zip(PLAIN, CIPHER)}
 REVERSE_CIPHER_MAP = {c: p for (p, c) in zip(PLAIN, CIPHER)}
 
@@ -23,3 +25,4 @@ def encode(st):
             encoded.append(ch)
     partition = [encoded[i:i + GROUP_SIZE] for i in range(0, len(encoded), GROUP_SIZE)]
     return ' '.join([''.join(elem) for elem in partition])
+
