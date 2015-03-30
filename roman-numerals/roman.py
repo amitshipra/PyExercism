@@ -48,3 +48,5 @@ def numeral(arabic):
                             roman_numeral[i] = tmp
 
     return ''.join(roman_numeral)
+
+print(numeral(266))
