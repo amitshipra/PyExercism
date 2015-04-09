@@ -86,6 +86,7 @@ def pad_zero(x):
 
 
 DELIMITER = '||'
+DATE_PATTERN = 'YYYYMMDD'
 
 
 class AssetClassFileHandler:
@@ -104,18 +105,50 @@ class AssetClassFileHandler:
         sources = self.config.get_properties_by_qualifier(asset_class_working, 'SOURCE')
         destination, ok_file = self.config.get_properties_by_qualifier(asset_class_working, 'DESTINATION')[0][1].split(
             DELIMITER)
+        # # Little Deviation for Rates class.
+        if asset_class in ['Rates']:
+            ok_file = ok_file.replace(DATE_PATTERN, self.process_date)
         print('Asset Class [{1}] has destination {0}. OK File: {2}'.format(destination, asset_class, ok_file))
+        source_status = []
         for source, value in sources:
             print('Processing source {0}'.format(source))
             value = value + DELIMITER + "False"
-            src_path, src_pattern, dest_pattern, status = value.split('||')
-            src_pattern = src_pattern.replace('YYYYMMDD', self.process_date)
+            src_tuple = src_path, src_pattern, dest_pattern, status = value.split('||')
+            source_status.append(src_tuple)
+            src_pattern = src_pattern.replace(DATE_PATTERN, self.process_date)
             for file in os.listdir(src_path):
                 if fnmatch.fnmatch(file, src_pattern):
                     print('MATCH found for File: {0} Pattern {1}'.format(file, src_pattern))
-
+                    src = os.path.join(src_path, file)
+                    if self.copyFile(src, file, destination, dest_pattern):
+                        src_tuple[3] = True
                     break
 
+            for src_status in source_status:
+                print('Source {0} Status {1}'.format(src_status[0], src_status[3]))
+
+
+    def copyFile(self, src, src_file_name, dest, dest_pattern):
+        try:
+            print('Trying to copy [{0} to [{1}]]'.format(src, dest))
+            dest_file_name = src_file_name
+            if DATE_PATTERN in dest_pattern:
+                dest_file_name = dest_pattern.replace(DATE_PATTERN, self.process_date)
+            if dest_pattern != 'SAME':
+                dest_file_name = dest_pattern
+            print('Destination File Name: {0}'.format(dest_file_name))
+
+            shutil.copy2(src, dest)
+            #Rename the file
+            dst_file = os.path.join(dest, src_file_name)
+            new_dst_file_name = os.path.join(dest, dest_file_name)
+            os.rename(dst_file, new_dst_file_name)
+
+            print('File copied successfully')
+            return True
+        except Exception:
+            print('Could not process the file transfer/rename. OK File would not be generated')
+            return False
 
 class ConfigFile:
     def __init__(self, file_name='recon-files.config'):
