@@ -24,8 +24,12 @@ def pad_zero(x):
 
 def get_formatted_date(date=None):
     if date is None or date.strip() == '':
+        print('Date not specified. Defaulting it TODAY')
         today = datetime.date.today()
-    return '{0}{1}{2}'.format(today.year, pad_zero(today.month), pad_zero(today.day))
+        return '{0}{1}{2}'.format(today.year, pad_zero(today.month), pad_zero(today.day))
+
+    print('Working with date: {}'.format(date))
+    return date
 
 
 class AssetClassFileHandler:
@@ -48,41 +52,48 @@ class AssetClassFileHandler:
         for source, value in sources:
             print('Processing source {0}'.format(source))
             value = value + DELIMITER + "False"
-            src_tuple = src_dir, src_pattern, dest_pattern, status = value.split('||')
+            src_tuple = (src_dir, src_pattern, dest_pattern, status) = value.split('||')
             source_status.append(src_tuple)
             src_pattern = src_pattern.replace(DATE_PATTERN, self.process_date)
             for file in os.listdir(src_dir):
                 if fnmatch.fnmatch(file, src_pattern):
                     print('MATCH found for File: {0} Pattern {1}'.format(file, src_pattern))
                     src = os.path.join(src_dir, file)
-                    if self.copy_file(src, file, destination, dest_pattern):
-                        src_tuple[3] = True
+                    src_tuple[3] = self.copy_file(src, file, destination, dest_pattern)
                     break
 
-        if all([status[3] for status in source_status]):
+        if all([True if status[3] is True else False for status in source_status]):
             # If all statuses are True - Generate the OK file
             print('All transfers went OK - generating the OK FILE')
             abs_file = os.path.join(destination, ok_file)
             with open(abs_file, 'w') as f:
                 f.write('')
             print('OK File Generated Successfully. {0} Asset class is completed'.format(asset_class))
+        else:
+            print('OK File NOT Generated as transfer didnt go for all files. {0} Asset class is NOT complete'.format(asset_class))
+            for x in source_status:
+                if x[3] == 'False':
+                    print('Failed file transfer for [{0}] Date [{1}]'.format(x[1], self.process_date))
 
 
-    def copy_file(self, src, src_file_name, dest, dest_pattern):
+    def copy_file(self, src, src_file_name, dest_dir, dest_pattern):
         try:
-            print('Trying to copy [{0} to [{1}]]'.format(src, dest))
+            print('Trying to copy [{0} to [{1}]]'.format(src, dest_dir))
             dest_file_name = src_file_name
+            shutil.copy(src, dest_dir)
+
             if DATE_PATTERN in dest_pattern:
                 dest_file_name = dest_pattern.replace(DATE_PATTERN, self.process_date)
             elif dest_pattern != 'SAME':
                 dest_file_name = dest_pattern
             print('Destination File Name: {0}'.format(dest_file_name))
 
-            shutil.copy(src, dest)
             # Rename the file
-            dst_file = os.path.join(dest, src_file_name)
-            new_dst_file_name = os.path.join(dest, dest_file_name)
-            os.rename(dst_file, new_dst_file_name)
+            if dest_pattern != 'SAME':
+                print('Renaming the file as Dest Pattern [{}] is Not SAME'.format(dest_pattern))
+                dst_file = os.path.join(dest_dir, src_file_name)
+                new_dst_file_name = os.path.join(dest_dir, dest_file_name)
+                os.rename(dst_file, new_dst_file_name)
 
             print('File copied successfully')
             return True
@@ -93,7 +104,7 @@ class AssetClassFileHandler:
 
 class ConfigFile:
     def __init__(self, file_name='recon-files.config'):
-        self.config = {system: [] for system in SYSTEMS}
+        self.config = {x: [] for x in SYSTEMS}
         print('------Reading Config')
 
         with open(file_name) as config_file:
@@ -102,8 +113,8 @@ class ConfigFile:
                 if line.startswith('#') or line.strip() is '':
                     continue
                 name, property_val = line.strip().split('=')
-                system, qualifier = name.split('_')
-                self.config[system].append((qualifier, property_val))
+                source_system, qualifier = name.split('_')
+                self.config[source_system].append((qualifier, property_val))
             self.check_validity()
             print('------Config loaded and validated')
 
@@ -125,16 +136,18 @@ class ConfigFile:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Processing Files transfer for Recon for Single or all asset classes for today or a particular date')
+        description='Single or all asset classes for today or a particular date')
 
     # ##
     # Usage:
     # >>  python ReconFileHandler.py --asset_class Rates --run_date 20140410
     # ##
-    parser.add_argument("--asset_class", "--asset_class", help="Asset Class from {Rates, FX, Commodities, Equities}",
+    parser.add_argument("--asset_class", "--asset_class",
+                        help="Asset Class from {Rates, FX, Commodities, Equities}. Default is ALL",
                         default='ALL')
     default_dt = get_formatted_date()
-    parser.add_argument("--run_date", "--run_date", help="Date in YYYYMMDD format", default=default_dt)
+    parser.add_argument("--run_date", "--run_date", help="Date in YYYYMMDD format. Default is current date",
+                        default=default_dt)
 
     args = parser.parse_args()
 
@@ -142,9 +155,16 @@ if __name__ == '__main__':
         args.asset_class,
         args.run_date
     ))
+
+    if args.asset_class not in SYSTEMS and args.asset_class != 'ALL':
+        raise ValueError('Invalid source system [{}]'.format(args.asset_class))
+
+    if len(args.run_date) != len(DATE_PATTERN):
+        raise ValueError('Invalid Date Format YYYYMMDD [{}]'.format(args.run_date))
+
     handler = AssetClassFileHandler(args.run_date)
     if args.asset_class == 'ALL':
-        for system in SYSTEMS:
-            handler.process(system)
+        for src_system in SYSTEMS:
+            handler.process(src_system)
     else:
-        handler.process(args.system)
+        handler.process(args.asset_class)
