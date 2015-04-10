@@ -22,7 +22,7 @@ def pad_zero(x):
     return x
 
 
-def get_formatted_date(date):
+def get_formatted_date(date=None):
     if date is None or date.strip() == '':
         today = datetime.date.today()
     return '{0}{1}{2}'.format(today.year, pad_zero(today.month), pad_zero(today.day))
@@ -35,9 +35,8 @@ class AssetClassFileHandler:
         self.config = ConfigFile()
 
     def process(self, asset_class):
-        asset_class = asset_class.strip()
-        print("Processing Asset Class [{1}] for date: {0}".format(self.process_date, asset_class))
-        asset_class_working = 'FX'
+        asset_class_working = asset_class.strip()
+        print("Processing Asset Class [{1}] for date: {0}".format(self.process_date, asset_class_working))
         sources = self.config.get_properties_by_qualifier(asset_class_working, 'SOURCE')
         destination, ok_file = self.config.get_properties_by_qualifier(asset_class_working, 'DESTINATION')[0][1].split(
             DELIMITER)
@@ -49,13 +48,13 @@ class AssetClassFileHandler:
         for source, value in sources:
             print('Processing source {0}'.format(source))
             value = value + DELIMITER + "False"
-            src_tuple = src_path, src_pattern, dest_pattern, status = value.split('||')
+            src_tuple = src_dir, src_pattern, dest_pattern, status = value.split('||')
             source_status.append(src_tuple)
             src_pattern = src_pattern.replace(DATE_PATTERN, self.process_date)
-            for file in os.listdir(src_path):
+            for file in os.listdir(src_dir):
                 if fnmatch.fnmatch(file, src_pattern):
                     print('MATCH found for File: {0} Pattern {1}'.format(file, src_pattern))
-                    src = os.path.join(src_path, file)
+                    src = os.path.join(src_dir, file)
                     if self.copy_file(src, file, destination, dest_pattern):
                         src_tuple[3] = True
                     break
@@ -130,17 +129,22 @@ if __name__ == '__main__':
 
     # ##
     # Usage:
-    # >>  python ReconFileHandler.py -source Rates -date YYYYMMDD
+    # >>  python ReconFileHandler.py --asset_class Rates --run_date 20140410
     # ##
-    parser.add_argument("-system", "--hostname", help="Asset Class from {Rates, FX, Commodities, Equities}",
+    parser.add_argument("--asset_class", "--asset_class", help="Asset Class from {Rates, FX, Commodities, Equities}",
                         default='ALL')
     default_dt = get_formatted_date()
-    parser.add_argument("-date", "--username", help="Date in YYYYMMDD format", default=default_dt)
+    parser.add_argument("--run_date", "--run_date", help="Date in YYYYMMDD format", default=default_dt)
 
     args = parser.parse_args()
 
-    print("Asset Class {} Date ".format(
-        args.system,
-        args.date
+    print("Asset Class [{0}] Date [{1}] ".format(
+        args.asset_class,
+        args.run_date
     ))
-    AssetClassFileHandler().process('Rates')
+    handler = AssetClassFileHandler(args.run_date)
+    if args.asset_class == 'ALL':
+        for system in SYSTEMS:
+            handler.process(system)
+    else:
+        handler.process(args.system)
