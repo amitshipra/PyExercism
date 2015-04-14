@@ -14,6 +14,7 @@ def animation(speed, init_position):
         for idx, x in enumerate(position):
             if not ignore(x, idx, speed, total_length):
                 move_particle(x, idx, speed, new_position)
+            ## This is where particle is bumbed out of container.
             elif x == 'R' and idx + speed >= total_length or x == 'L' and idx - speed < 0:
                 new_position.pop(idx)
                 new_position.insert(idx, '.')
@@ -22,6 +23,9 @@ def animation(speed, init_position):
 
     return collect_frames(init_position)
 
+
+## Removing the Current Char from the index and replacing it with '.'
+## Next is to move to particle to new index and replace that as well.
 def move_particle(ch, idx, speed, new_position):
     new_position.pop(idx)
     new_position.insert(idx, '.')
@@ -49,3 +53,8 @@ def is_exit_condition(position):
 
 def format_position(position):
     return ''.join(['X' if ch != '.' else ch for ch in position])
+
+
+frames = animation(2, init_position='LRRL.LR.LRR.R.LRRL.')
+for frame in frames:
+    print(frame)
