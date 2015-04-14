@@ -47,11 +47,11 @@ considered part of the input or output strings.)
 
 >>  2,  "..R...."
 
-Returns:
-{ "..X....",
+Returns: { "..X....",
   "....X..",
   "......X",
   "......." }
+
 
 The single particle starts at the 3rd position, moves to the 5th, then
 7th, and then out of the chamber.
