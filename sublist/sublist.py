@@ -1,5 +1,6 @@
 __author__ = 'agupta'
 
+
 class EQUAL:
     pass
 
@@ -43,6 +44,8 @@ def check_lists(list1, list2):
     else:
         long_list, small_list = list2, list1
 
+    ## Recursive solution. This doesn't work very long list
+    # but still kept here for understanding
     def is_sublist(_small_list, _long_list):
         first_element = _small_list[0]
         if first_element not in _long_list:
@@ -56,7 +59,26 @@ def check_lists(list1, list2):
         else:
             return is_sublist(_small_list, _long_list[index_first_element + 1:])
 
-    is_sublist = is_sublist(small_list, long_list)
+    def is_sublist_iter(_small_list, _long_list):
+        first_element = _small_list[0]
+        if first_element not in _long_list:
+            return UNEQUAL
+
+        index = _long_list.index(first_element)
+
+        while index < len(_long_list) - len(_small_list):
+            sub_list = _long_list[index:index + len(_small_list)]
+            if is_equal(sub_list, _small_list):
+                return EQUAL
+            index += 1
+
+        return UNEQUAL
+
+    if len(long_list) < 10000:
+        is_sublist = is_sublist(small_list, long_list)
+    else:
+        is_sublist = is_sublist_iter(small_list, long_list)
+
     if is_sublist == EQUAL and is_equal(list1, small_list):
         return SUBLIST
     elif is_sublist == EQUAL and is_equal(list2, small_list):
