@@ -17,4 +17,4 @@ def is_valid(num):
     return True
 
 
-print(parse_binary('1'))
+print(parse_binary('10011'))
