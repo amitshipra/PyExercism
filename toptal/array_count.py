@@ -10,13 +10,13 @@ def solution(X, A):
         if left_count == right_count:
             print left, ':', right
             return idx
-        return -1
+        return None
 
     for idx in range(1, len(A)):
-        if is_equal(idx) != -1:
+        if is_equal(idx) is not None:
             return idx
 
     return -1
 
 
-print solution(5, [5, 5, 3, 2, 5, 6, 7, 8])
+print solution(5, [5, 5, 3, 2, 5, 6, 7, 8, 5, 6])
