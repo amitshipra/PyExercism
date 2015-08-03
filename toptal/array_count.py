@@ -13,9 +13,9 @@ def solution(X, A):
         return -1
 
     # This finds all the indexes. We can abort the search with first one if performance is an issue.
-    indexes = [idx for idx in range(1, len(A)) if is_equal(idx) != -1]
-    if len(indexes) > 0:
-        return indexes[0]
+    for idx in range(1, len(A)):
+        if is_equal(idx) != -1:
+            return idx
 
     return -1
 
