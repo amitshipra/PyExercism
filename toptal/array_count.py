@@ -12,7 +12,6 @@ def solution(X, A):
             return idx
         return -1
 
-    # This finds all the indexes. We can abort the search with first one if performance is an issue.
     for idx in range(1, len(A)):
         if is_equal(idx) != -1:
             return idx
