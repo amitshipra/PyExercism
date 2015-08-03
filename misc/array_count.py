@@ -30,8 +30,8 @@ def solution(X, A):
 
 
 array = list()
-N = 20
+N = 10
 for _ in range(1, N):
     array.append(random.randint(1, 5))
 
-print solution(5, array)
+print solution(1, array)
