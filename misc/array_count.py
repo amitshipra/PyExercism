@@ -3,7 +3,6 @@ __author__ = 'dias'
 import random
 import time
 
-
 def solution(X, A):
     def is_equal(idx):
         left, right = A[:idx], A[idx:]
