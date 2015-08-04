@@ -12,9 +12,9 @@ def board(white, black):
     for x in range(8):
         row = ''
         for y in range(8):
-            if x == white[0] and y == white[1]:
+            if (x, y) == white:
                 square = 'W'
-            elif x == black[0] and y == black[1]:
+            elif (x, y) == black:
                 square = 'B'
             else:
                 square = '_'
