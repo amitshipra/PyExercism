@@ -1,7 +1,7 @@
 import unittest
 
 from robot import Robot
-import random
+import random_test
 
 
 class RobotTest(unittest.TestCase):
@@ -26,14 +26,14 @@ class RobotTest(unittest.TestCase):
         seed = "Totally random."
 
         # Initialize RNG using the seed
-        random.seed(seed)
+        random_test.seed(seed)
 
         # Call the generator
         robot = Robot()
         name = robot.name
 
         # Reinitialize RNG using seed
-        random.seed(seed)
+        random_test.seed(seed)
 
         # Call the generator again
         robot.reset()

@@ -1,6 +1,6 @@
 __author__ = 'dias'
 
-import random
+import random_test
 import time
 
 def solution(X, A):
@@ -31,6 +31,6 @@ def solution(X, A):
 array = list()
 N = 10
 for _ in range(1, N):
-    array.append(random.randint(1, 5))
+    array.append(random_test.randint(1, 5))
 
 print solution(1, array)

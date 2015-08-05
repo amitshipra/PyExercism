@@ -1,6 +1,6 @@
 __author__ = 'dias'
 
-import random as rand
+import random_test as rand
 import string
 import math
 
