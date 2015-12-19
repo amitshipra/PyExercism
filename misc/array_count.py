@@ -1,7 +1,7 @@
 __author__ = 'dias'
 
-import random_test
 import time
+import random
 
 def solution(X, A):
     def is_equal(idx):
@@ -31,6 +31,6 @@ def solution(X, A):
 array = list()
 N = 10
 for _ in range(1, N):
-    array.append(random_test.randint(1, 5))
+    array.append(random.randint(1, 5))
 
 print solution(1, array)

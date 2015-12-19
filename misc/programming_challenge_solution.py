@@ -8,7 +8,7 @@ def numerology(num):
         return numerology(sum([int(x) for x in str(num)]))
 
 
-print(numerology(998))
+print(numerology(651978))
 
 
 # Problem 2:

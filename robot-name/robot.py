@@ -1,8 +1,7 @@
 __author__ = 'dias'
 
-import random_test as rand
+import random as rand
 import string
-import math
 
 ALL_CHARS = string.ascii_uppercase
 
@@ -28,3 +27,26 @@ class Robot:
 robot = Robot()
 
 print(robot.name)
+
+
+## Much elegant solution.
+from random import sample, seed
+from string import ascii_uppercase as AZ
+
+nums = [str(c) for c in xrange(10)]
+
+class Robot2:
+
+    def __init__(self):
+        self.name = self.generate_name()
+
+    def reset(self):
+        self.name = self.generate_name()
+
+    def generate_name(self):
+        seed() # seed from current time
+        return ''.join(sample(AZ, 2) + sample(nums, 3))
+
+robot2 = Robot2()
+
+print(robot2.name)
