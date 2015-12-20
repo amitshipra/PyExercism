@@ -52,9 +52,9 @@ def is_exit_condition(position):
 
 
 def format_position(position):
-    return ''.join(['X' if ch != '.' else ch for ch in position])
+    return ''.join([ch if ch != '.' else ch for ch in position])
 
 
-frames = animation(2, init_position='LRRL.LR.LRR.R.LRRL.')
+frames = animation(2, init_position='RR..LRL')
 for frame in frames:
     print(frame)
